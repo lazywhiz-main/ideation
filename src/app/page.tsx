@@ -145,8 +145,8 @@ export default function Home() {
         <div className="flex justify-center gap-6 mb-10">
           <Button 
             onClick={drawRandomCards} 
-            className="font-bold shadow h-14 px-8 text-lg rounded-lg flex items-center gap-2"
-            style={{ background: mainColor, color: '#fff' }}
+            className="font-bold shadow h-14 px-8 text-lg rounded-lg flex items-center gap-2 border"
+            style={{ background: '#eaf2fd', color: mainColor, borderColor: mainColor }}
           >
             <span role="img" aria-label="カード">🎴</span> カードを引く
           </Button>
