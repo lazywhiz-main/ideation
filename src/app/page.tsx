@@ -1,103 +1,162 @@
-import Image from "next/image";
+'use client';
+
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { whoCards, whatCards, howCards } from '@/data/cards';
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [selectedWho, setSelectedWho] = useState<string>('');
+  const [selectedWhat, setSelectedWhat] = useState<string>('');
+  const [selectedHow, setSelectedHow] = useState<string>('');
+  const [ideaTitle, setIdeaTitle] = useState<string>('');
+  const [ideaDesc, setIdeaDesc] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const drawRandomCards = () => {
+    const randomWho = whoCards[Math.floor(Math.random() * whoCards.length)];
+    const randomWhat = whatCards[Math.floor(Math.random() * whatCards.length)];
+    const randomHow = howCards[Math.floor(Math.random() * howCards.length)];
+    setSelectedWho(randomWho);
+    setSelectedWhat(randomWhat);
+    setSelectedHow(randomHow);
+  };
+
+  const generateIdea = async () => {
+    if (!selectedWho || !selectedWhat || !selectedHow) {
+      alert('すべてのカードを選択してください');
+      return;
+    }
+    setIsLoading(true);
+    setIdeaTitle('');
+    setIdeaDesc('');
+    try {
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ who: selectedWho, what: selectedWhat, how: selectedHow }),
+      });
+      const data = await response.json();
+      setIdeaTitle(data.title);
+      setIdeaDesc(data.description);
+    } catch (error) {
+      console.error('Error generating idea:', error);
+      alert('アイデアの生成中にエラーが発生しました');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <main className="min-h-screen p-8 bg-blue-50">
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-3xl font-bold mb-8 text-center text-blue-700">事業アイデア生成ツール</h1>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold mb-4 text-blue-600">Who</h2>
+            <div className="grid grid-cols-2 gap-4">
+              {whoCards.map((card) => (
+                <Card
+                  key={card}
+                  className={`cursor-pointer transition-all ${
+                    selectedWho === card
+                      ? 'border-2 border-pink-400 bg-pink-100 shadow-md scale-105'
+                      : 'hover:border-blue-400'
+                  }`}
+                  onClick={() => setSelectedWho(card)}
+                >
+                  <CardContent className="p-4 text-center font-semibold text-blue-700">
+                    {card}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold mb-4 text-purple-600">What</h2>
+            <div className="grid grid-cols-2 gap-4">
+              {whatCards.map((card) => (
+                <Card
+                  key={card}
+                  className={`cursor-pointer transition-all ${
+                    selectedWhat === card
+                      ? 'border-2 border-blue-400 bg-blue-100 shadow-md scale-105'
+                      : 'hover:border-purple-400'
+                  }`}
+                  onClick={() => setSelectedWhat(card)}
+                >
+                  <CardContent className="p-4 text-center font-semibold text-purple-700">
+                    {card}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold mb-4 text-pink-600">How</h2>
+            <div className="grid grid-cols-2 gap-4">
+              {howCards.map((card) => (
+                <Card
+                  key={card}
+                  className={`cursor-pointer transition-all ${
+                    selectedHow === card
+                      ? 'border-2 border-purple-400 bg-purple-100 shadow-md scale-105'
+                      : 'hover:border-pink-400'
+                  }`}
+                  onClick={() => setSelectedHow(card)}
+                >
+                  <CardContent className="p-4 text-center font-semibold text-pink-700">
+                    {card}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+        <div className="flex justify-center gap-4 mb-8">
+          <Button 
+            onClick={drawRandomCards} 
+            className="bg-blue-600 text-white font-bold shadow hover:bg-blue-700 h-14 px-8 text-lg rounded-lg"
+          >
+            カードを引く
+          </Button>
+          <Button 
+            onClick={generateIdea}
+            disabled={isLoading}
+            className="min-w-[140px] h-14 px-8 text-lg rounded-lg bg-pink-500 text-white font-bold shadow hover:bg-pink-600"
+          >
+            {isLoading ? (
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <span>生成中...</span>
+              </div>
+            ) : (
+              'アイデアを生成'
+            )}
+          </Button>
+        </div>
+        {isLoading && (
+          <Card className="bg-white animate-pulse border-blue-200">
+            <CardHeader>
+              <CardTitle className="text-blue-500">アイデアを生成中...</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-4 bg-blue-100 rounded w-3/4 mb-4"></div>
+              <div className="h-4 bg-purple-100 rounded w-1/2"></div>
+            </CardContent>
+          </Card>
+        )}
+        {!isLoading && ideaTitle && (
+          <Card className="bg-white border-2 border-blue-200 shadow-xl mt-4">
+            <CardHeader>
+              <CardTitle className="text-2xl font-bold text-blue-700 mb-2">{ideaTitle}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="whitespace-pre-wrap text-lg text-gray-700">{ideaDesc}</p>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    </main>
   );
 }
