@@ -142,10 +142,10 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <div className="flex justify-center gap-6 mb-10">
+        <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6 mb-10 w-full max-w-xl mx-auto">
           <Button 
             onClick={drawRandomCards} 
-            className="font-bold shadow h-14 px-8 text-lg rounded-lg flex items-center gap-2 border"
+            className="font-bold shadow h-14 px-8 text-lg rounded-lg flex items-center gap-2 border w-full sm:w-auto justify-center"
             style={{ background: '#eaf2fd', color: mainColor, borderColor: mainColor }}
           >
             <span role="img" aria-label="カード">🎴</span> カードを引く
@@ -153,7 +153,7 @@ export default function Home() {
           <Button 
             onClick={generateIdea}
             disabled={isLoading}
-            className="min-w-[140px] h-14 px-8 text-lg rounded-lg font-bold shadow flex items-center gap-2"
+            className="min-w-[140px] h-14 px-8 text-lg rounded-lg font-bold shadow flex items-center gap-2 w-full sm:w-auto justify-center"
             style={{ background: mainColor, color: '#fff' }}
           >
             <span role="img" aria-label="電球">💡</span> {isLoading ? (
